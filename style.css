@@ -1703,3 +1703,7 @@ body.testimonials-page nav ul li a:hover {
     letter-spacing: 0.5px;
   }
 }
+
+.hidden {
+  display: none;
+}

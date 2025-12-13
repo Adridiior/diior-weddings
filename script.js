@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================
   // Contact form submission
   // =============================
-  const form = document.querySelector("form");
+  const form = document.querySelector("#contact-form");
 
   if (form) {
     form.addEventListener("submit", async (e) => {
@@ -124,42 +124,22 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // 4) If valid -> send
-      if (statusDiv) {
-        statusDiv.innerHTML = '<span class="spinner"></span> Sending...';
-        statusDiv.className = "form-status pending";
-      }
-
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-
+      // Submit to Netlify (no backend fetch)
       try {
-        const response = await fetch("/send-message", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
+        // Optional: disable the button to avoid double clicks
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
 
-        const result = await response.json();
-
-        if (response.ok) {
-          if (statusDiv) {
-            statusDiv.textContent = result.message || "Message sent successfully!";
-            statusDiv.className = "form-status success";
-          }
-          form.reset();
-        } else {
-          if (statusDiv) {
-            statusDiv.textContent = result.message || "An error occurred while sending your message.";
-            statusDiv.className = "form-status error";
-          }
-        }
+        // Let the browser submit the form normally (Netlify will capture it)
+        form.submit();
       } catch (error) {
         if (statusDiv) {
-          statusDiv.textContent = "A network error occurred. Please try again later.";
+          statusDiv.textContent = "An error occurred. Please try again later.";
           statusDiv.className = "form-status error";
         }
         console.error(error);
       }
+
     });
   }
 });
