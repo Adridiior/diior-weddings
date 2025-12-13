@@ -123,22 +123,43 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // 4) If valid -> send
-      // Submit to Netlify (no backend fetch)
-      try {
-        // Optional: disable the button to avoid double clicks
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) btn.disabled = true;
+    // Submit to Netlify via AJAX (stay on page)
+try {
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) btn.disabled = true;
 
-        // Let the browser submit the form normally (Netlify will capture it)
-        form.submit();
-      } catch (error) {
-        if (statusDiv) {
-          statusDiv.textContent = "An error occurred. Please try again later.";
-          statusDiv.className = "form-status error";
-        }
-        console.error(error);
-      }
+  const formData = new FormData(form);
+  const body = new URLSearchParams(formData).toString();
+
+  const response = await fetch("/", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+
+  if (response.ok) {
+    if (statusDiv) {
+      statusDiv.textContent = "Message sent successfully!";
+      statusDiv.className = "form-status success";
+    }
+    form.reset();
+  } else {
+    if (statusDiv) {
+      statusDiv.textContent = "An error occurred while sending your message.";
+      statusDiv.className = "form-status error";
+    }
+  }
+
+  if (btn) btn.disabled = false;
+} catch (error) {
+  if (statusDiv) {
+    statusDiv.textContent = "A network error occurred. Please try again later.";
+    statusDiv.className = "form-status error";
+  }
+  console.error(error);
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) btn.disabled = false;
+}
 
     });
   }
